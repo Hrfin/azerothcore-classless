@@ -1,3 +1,5 @@
+Currently a HUGE WIP - Made to be an exercise in learning the application and to have fun - Not Playable yet
+
 # ![logo](https://raw.githubusercontent.com/azerothcore/azerothcore.github.io/master/images/logo-github.png) AzerothCore
 
 [![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-2.1-4baaaa.svg)](CODE_OF_CONDUCT.md)
