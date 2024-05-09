@@ -2268,7 +2268,7 @@ InventoryResult Player::CanUseItem(Item* pItem, bool not_loading) const
                     // In fact it's a visual bug, everything works properly... I need sniffs of operations with
                     // binded to account items from off server.
 
-                    if (IsClass(CLASS_PALADIN, CLASS_CONTEXT_EQUIP_ARMOR_CLASS) || IsClass(CLASS_WARRIOR, CLASS_CONTEXT_EQUIP_ARMOR_CLASS))
+                    if (IsClass(CLASS_PALADIN, CLASS_CONTEXT_EQUIP_ARMOR_CLASS) || IsClass(CLASS_WARRIOR, CLASS_CONTEXT_EQUIP_ARMOR_CLASS) || IsClass(CLASS_WARRIOR, CLASS_CONTEXT_EQUIP_ARMOR_CLASS))
                     {
                         allowEquip = (itemSkill == SKILL_PLATE_MAIL);
                     }
@@ -2398,31 +2398,32 @@ InventoryResult Player::CanRollForItemInLFG(ItemTemplate const* proto, WorldObje
         if (proto->SubClass == ITEM_SUBCLASS_ARMOR_SHIELD && !(
             IsClass(CLASS_PALADIN, CLASS_CONTEXT_EQUIP_SHIELDS)
             || IsClass(CLASS_WARRIOR, CLASS_CONTEXT_EQUIP_SHIELDS)
-            || IsClass(CLASS_SHAMAN, CLASS_CONTEXT_EQUIP_SHIELDS)))
+            || IsClass(CLASS_SHAMAN, CLASS_CONTEXT_EQUIP_SHIELDS)
+            || IsClass(CLASS_HERO, CLASS_CONTEXT_EQUIP_SHIELDS)))
         {
             return EQUIP_ERR_NO_REQUIRED_PROFICIENCY;
         }
 
         // Check for librams.
-        if (proto->SubClass == ITEM_SUBCLASS_ARMOR_LIBRAM && !IsClass(CLASS_PALADIN, CLASS_CONTEXT_EQUIP_RELIC))
+        if (proto->SubClass == ITEM_SUBCLASS_ARMOR_LIBRAM && !IsClass(CLASS_PALADIN, CLASS_CONTEXT_EQUIP_RELIC) && !IsClass(CLASS_HERO, CLASS_CONTEXT_EQUIP_RELIC))
         {
             return EQUIP_ERR_YOU_CAN_NEVER_USE_THAT_ITEM;
         }
 
         // CHeck for idols.
-        if (proto->SubClass == ITEM_SUBCLASS_ARMOR_IDOL && !IsClass(CLASS_DRUID, CLASS_CONTEXT_EQUIP_RELIC))
+        if (proto->SubClass == ITEM_SUBCLASS_ARMOR_IDOL && !IsClass(CLASS_DRUID, CLASS_CONTEXT_EQUIP_RELIC) && !IsClass(CLASS_HERO, CLASS_CONTEXT_EQUIP_RELIC))
         {
             return EQUIP_ERR_YOU_CAN_NEVER_USE_THAT_ITEM;
         }
 
         // Check for totems.
-        if (proto->SubClass == ITEM_SUBCLASS_ARMOR_TOTEM && !IsClass(CLASS_SHAMAN, CLASS_CONTEXT_EQUIP_RELIC))
+        if (proto->SubClass == ITEM_SUBCLASS_ARMOR_TOTEM && !IsClass(CLASS_SHAMAN, CLASS_CONTEXT_EQUIP_RELIC) && !IsClass(CLASS_HERO, CLASS_CONTEXT_EQUIP_RELIC))
         {
             return EQUIP_ERR_YOU_CAN_NEVER_USE_THAT_ITEM;
         }
 
         // Check for sigils.
-        if (proto->SubClass == ITEM_SUBCLASS_ARMOR_SIGIL && !IsClass(CLASS_DEATH_KNIGHT, CLASS_CONTEXT_EQUIP_RELIC))
+        if (proto->SubClass == ITEM_SUBCLASS_ARMOR_SIGIL && !IsClass(CLASS_DEATH_KNIGHT, CLASS_CONTEXT_EQUIP_RELIC) && !IsClass(CLASS_HERO, CLASS_CONTEXT_EQUIP_RELIC))
         {
             return EQUIP_ERR_YOU_CAN_NEVER_USE_THAT_ITEM;
         }
@@ -2432,7 +2433,7 @@ InventoryResult Player::CanRollForItemInLFG(ItemTemplate const* proto, WorldObje
         proto->InventoryType != INVTYPE_CLOAK)
     {
         uint32 subclassToCompare = ITEM_SUBCLASS_ARMOR_CLOTH;
-        if (IsClass(CLASS_DEATH_KNIGHT, CLASS_CONTEXT_EQUIP_ARMOR_CLASS) || IsClass(CLASS_PALADIN, CLASS_CONTEXT_EQUIP_ARMOR_CLASS))
+        if (IsClass(CLASS_DEATH_KNIGHT, CLASS_CONTEXT_EQUIP_ARMOR_CLASS) || IsClass(CLASS_PALADIN, CLASS_CONTEXT_EQUIP_ARMOR_CLASS) || IsClass(CLASS_HERO, CLASS_CONTEXT_EQUIP_ARMOR_CLASS))
         {
             subclassToCompare = ITEM_SUBCLASS_ARMOR_PLATE;
         }

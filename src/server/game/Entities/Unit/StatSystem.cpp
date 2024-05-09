@@ -354,6 +354,19 @@ void Player::UpdateAttackPowerAndDamage(bool ranged)
         {
             val2 = level + GetStat(STAT_AGILITY) - 10.0f;
         }
+        else if (IsClass(CLASS_HERO, CLASS_CONTEXT_STATS))
+        {
+            switch (GetShapeshiftForm())
+            {
+            case FORM_CAT:
+            case FORM_BEAR:
+            case FORM_DIREBEAR:
+                val2 = 0.0f;
+                break;
+            default:
+                val2 = level * 2.0f + GetStat(STAT_AGILITY) - 10.0f;
+            }
+        }
         else if (IsClass(CLASS_DRUID, CLASS_CONTEXT_STATS))
         {
             switch (GetShapeshiftForm())
@@ -446,7 +459,6 @@ void Player::UpdateAttackPowerAndDamage(bool ranged)
                     }
                 }
             }
-
             switch (GetShapeshiftForm())
             {
             case FORM_CAT:
@@ -461,6 +473,87 @@ void Player::UpdateAttackPowerAndDamage(bool ranged)
                 break;
             default:
                 val2 = GetStat(STAT_STRENGTH) * 2.0f - 20.0f;
+                break;
+            }
+        }
+        else if (IsClass(CLASS_HERO, CLASS_CONTEXT_STATS))
+        {
+            // Check if Predatory Strikes is skilled
+            float mLevelMult = 0.0f;
+            float weapon_bonus = 0.0f;
+            if (IsInFeralForm())
+            {
+                Unit::AuraEffectList const& mDummy = GetAuraEffectsByType(SPELL_AURA_DUMMY);
+                for (Unit::AuraEffectList::const_iterator itr = mDummy.begin(); itr != mDummy.end(); ++itr)
+                {
+                    AuraEffect* aurEff = *itr;
+                    if (aurEff->GetSpellInfo()->SpellIconID == 1563)
+                    {
+                        switch (aurEff->GetEffIndex())
+                        {
+                        case 0: // Predatory Strikes (effect 0)
+                            mLevelMult = CalculatePct(1.0f, aurEff->GetAmount());
+                            break;
+                        case 1: // Predatory Strikes (effect 1)
+                            if (Item* mainHand = m_items[EQUIPMENT_SLOT_MAINHAND])
+                            {
+                                // also gains % attack power from equipped weapon
+                                ItemTemplate const* proto = mainHand->GetTemplate();
+                                if (!proto)
+                                    continue;
+
+                                uint32 ap = proto->getFeralBonus();
+                                // Get AP Bonuses from weapon
+                                for (uint8 i = 0; i < MAX_ITEM_PROTO_STATS; ++i)
+                                {
+                                    if (i >= proto->StatsCount)
+                                        break;
+
+                                    if (proto->ItemStat[i].ItemStatType == ITEM_MOD_ATTACK_POWER)
+                                        ap += proto->ItemStat[i].ItemStatValue;
+                                }
+
+                                // Get AP Bonuses from weapon spells
+                                for (uint8 i = 0; i < MAX_ITEM_PROTO_SPELLS; ++i)
+                                {
+                                    // no spell
+                                    if (!proto->Spells[i].SpellId || proto->Spells[i].SpellTrigger != ITEM_SPELLTRIGGER_ON_EQUIP)
+                                        continue;
+
+                                    // check if it is valid spell
+                                    SpellInfo const* spellproto = sSpellMgr->GetSpellInfo(proto->Spells[i].SpellId);
+                                    if (!spellproto)
+                                        continue;
+
+                                    for (uint8 j = 0; j < MAX_SPELL_EFFECTS; ++j)
+                                        if (spellproto->Effects[j].ApplyAuraName == SPELL_AURA_MOD_ATTACK_POWER)
+                                            ap += spellproto->Effects[j].CalcValue();
+                                }
+
+                                weapon_bonus = CalculatePct(float(ap), aurEff->GetAmount());
+                            }
+                            break;
+                        default:
+                            break;
+                        }
+                    }
+                }
+
+            }
+            switch (GetShapeshiftForm())
+            {
+            case FORM_CAT:
+                val2 = (GetLevel() * mLevelMult) + GetStat(STAT_STRENGTH) * 2.0f + GetStat(STAT_AGILITY) * 2.0f - 20.0f + weapon_bonus + m_baseFeralAP;
+                break;
+            case FORM_BEAR:
+            case FORM_DIREBEAR:
+                val2 = (GetLevel() * mLevelMult) + GetStat(STAT_STRENGTH) * 2.0f + GetStat(STAT_AGILITY) * 1.5f - 20.0f + weapon_bonus + m_baseFeralAP;
+                break;
+            case FORM_MOONKIN:
+                val2 = (GetLevel() * mLevelMult) + GetStat(STAT_STRENGTH) * 2.0f + GetStat(STAT_AGILITY) * 1.5f - 20.0f + m_baseFeralAP;
+                break;
+            default:
+                val2 = level * 2.0f + GetStat(STAT_STRENGTH) * 1.5f + GetStat(STAT_AGILITY) * 1.5f - 20.0f;
                 break;
             }
         }
@@ -485,7 +578,7 @@ void Player::UpdateAttackPowerAndDamage(bool ranged)
                 attPowerMod += CalculatePct(GetStat(Stats((*i)->GetMiscValue())), (*i)->GetAmount());
         }
     }
-    else
+    else if(!IsClass(CLASS_HERO, CLASS_CONTEXT_STATS))
     {
         AuraEffectList const& mAPbyStat = GetAuraEffectsByType(SPELL_AURA_MOD_ATTACK_POWER_OF_STAT_PERCENT);
         for (AuraEffectList::const_iterator i = mAPbyStat.begin(); i != mAPbyStat.end(); ++i)
@@ -496,6 +589,21 @@ void Player::UpdateAttackPowerAndDamage(bool ranged)
             // always: ((*i)->GetModifier()->m_miscvalue == 1 == SPELL_SCHOOL_MASK_NORMAL)
             attPowerMod += int32(GetArmor() / (*iter)->GetAmount());
     }
+    else {
+        AuraEffectList const& mRAPbyStat = GetAuraEffectsByType(SPELL_AURA_MOD_RANGED_ATTACK_POWER_OF_STAT_PERCENT);
+        for (AuraEffectList::const_iterator i = mRAPbyStat.begin(); i != mRAPbyStat.end(); ++i)
+            attPowerMod += CalculatePct(GetStat(Stats((*i)->GetMiscValue())), (*i)->GetAmount());
+
+        AuraEffectList const& mAPbyStat = GetAuraEffectsByType(SPELL_AURA_MOD_ATTACK_POWER_OF_STAT_PERCENT);
+        for (AuraEffectList::const_iterator i = mAPbyStat.begin(); i != mAPbyStat.end(); ++i)
+            attPowerMod += CalculatePct(GetStat(Stats((*i)->GetMiscValue())), (*i)->GetAmount());
+
+        AuraEffectList const& mAPbyArmor = GetAuraEffectsByType(SPELL_AURA_MOD_ATTACK_POWER_OF_ARMOR);
+        for (AuraEffectList::const_iterator iter = mAPbyArmor.begin(); iter != mAPbyArmor.end(); ++iter)
+            // always: ((*i)->GetModifier()->m_miscvalue == 1 == SPELL_SCHOOL_MASK_NORMAL)
+            attPowerMod += int32(GetArmor() / (*iter)->GetAmount());
+    }
+
 
     float attPowerMultiplier = GetModifierValue(unitMod, TOTAL_PCT) - 1.0f;
 
@@ -702,7 +810,8 @@ const float m_diminishing_k[MAX_CLASSES] =
     0.9830f,  // Mage
     0.9830f,  // Warlock
     0.0f,     // ??
-    0.9720f   // Druid
+    0.9720f,   // Druid
+    0.9880f  // CLASS_HERO
 };
 
 float Player::GetMissPercentageFromDefence() const
@@ -719,7 +828,8 @@ float Player::GetMissPercentageFromDefence() const
         16.00f,     // Mage    //?
         16.00f,     // Warlock //?
         0.0f,       // ??
-        16.00f      // Druid   //?
+        16.00f,      // Druid   //?
+        16.00f      //CLASS_HERO
     };
 
     float diminishing = 0.0f, nondiminishing = 0.0f;
@@ -746,7 +856,8 @@ void Player::UpdateParryPercentage()
         0.0f,           // Mage
         0.0f,           // Warlock
         0.0f,           // ??
-        0.0f            // Druid
+        0.0f,            // Druid
+        145.560408f     //CLASS_HERO
     };
 
     // No parry
@@ -792,7 +903,8 @@ void Player::UpdateDodgePercentage()
         150.375940f,    // Mage
         150.375940f,    // Warlock
         0.0f,           // ??
-        116.890707f     // Druid
+        116.890707f,     // Druid
+        145.560408f,    // CLASS_HERO
     };
 
     float diminishing = 0.0f, nondiminishing = 0.0f;

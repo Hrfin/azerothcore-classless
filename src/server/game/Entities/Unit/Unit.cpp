@@ -6618,6 +6618,7 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                             // Select class defined buff
                             switch (getClass())
                             {
+                                case CLASS_HERO:
                                 case CLASS_PALADIN:                 // 39511, 40997, 40998, 40999, 41002, 41005, 41009, 41011, 41409
                                 case CLASS_DRUID:                   // 39511, 40997, 40998, 40999, 41002, 41005, 41009, 41011, 41409
                                     triggered_spell_id = RAND(39511, 40997, 40998, 40999, 41002, 41005, 41009, 41011, 41409);
@@ -6811,6 +6812,13 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                             std::vector<uint32> RandomSpells;
                             switch (getClass())
                             {
+                                case CLASS_HERO:
+                                    RandomSpells.push_back(71484); // Strength
+                                    RandomSpells.push_back(71491); // Critical Strike
+                                    RandomSpells.push_back(71492); // Attack Power
+                                    RandomSpells.push_back(71486); // Agility
+                                    RandomSpells.push_back(71485); // Haste
+                                    break;
                                 case CLASS_WARRIOR:
                                 case CLASS_PALADIN:
                                 case CLASS_DEATH_KNIGHT:
@@ -7795,6 +7803,9 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                             // Set class defined buff
                             switch (victim->getClass())
                             {
+                                case CLASS_HERO:
+                                    triggered_spell_id = RAND(28795, 28793, 28791, 28790);
+                                    break;
                                 case CLASS_PALADIN:
                                 case CLASS_PRIEST:
                                 case CLASS_SHAMAN:
@@ -8044,6 +8055,9 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                             // Set class defined buff
                             switch (victim->getClass())
                             {
+                                case CLASS_HERO:
+                                    triggered_spell_id = RAND(28824, 28825, 28826, 28827);
+                                    break;
                                 case CLASS_PALADIN:
                                 case CLASS_PRIEST:
                                 case CLASS_SHAMAN:
@@ -16363,7 +16377,7 @@ void Unit::ProcDamageAndSpellFor(bool isVictim, Unit* target, uint32 procFlag, u
                 if (procExtra & PROC_EX_DODGE)
                 {
                     // Update AURA_STATE on dodge
-                    if (!IsClass(CLASS_ROGUE, CLASS_CONTEXT_ABILITY_REACTIVE)) // skip Rogue Riposte
+                    if (!IsClass(CLASS_ROGUE, CLASS_CONTEXT_ABILITY_REACTIVE) || !IsClass(CLASS_HERO, CLASS_CONTEXT_ABILITY_REACTIVE)) // skip Rogue Riposte
                     {
                         ModifyAuraState(AURA_STATE_DEFENSE, true);
                         StartReactiveTimer(REACTIVE_DEFENSE);
@@ -16396,7 +16410,7 @@ void Unit::ProcDamageAndSpellFor(bool isVictim, Unit* target, uint32 procFlag, u
                 // Overpower on victim dodge
                 if (procExtra & PROC_EX_DODGE)
                 {
-                    if (IsClass(CLASS_WARRIOR, CLASS_CONTEXT_ABILITY_REACTIVE))
+                    if (IsClass(CLASS_WARRIOR, CLASS_CONTEXT_ABILITY_REACTIVE) || IsClass(CLASS_HERO, CLASS_CONTEXT_ABILITY_REACTIVE))
                     {
                         AddComboPoints(target, 1);
                         StartReactiveTimer(REACTIVE_OVERPOWER);
@@ -17203,9 +17217,9 @@ void Unit::ClearAllReactives()
 
     if (HasAuraState(AURA_STATE_DEFENSE))
         ModifyAuraState(AURA_STATE_DEFENSE, false);
-    if (IsClass(CLASS_HUNTER, CLASS_CONTEXT_ABILITY_REACTIVE) && HasAuraState(AURA_STATE_HUNTER_PARRY))
+    if ((IsClass(CLASS_HUNTER, CLASS_CONTEXT_ABILITY_REACTIVE) || IsClass(CLASS_HERO, CLASS_CONTEXT_ABILITY_REACTIVE)) && HasAuraState(AURA_STATE_HUNTER_PARRY))
         ModifyAuraState(AURA_STATE_HUNTER_PARRY, false);
-    if (IsClass(CLASS_WARRIOR, CLASS_CONTEXT_ABILITY_REACTIVE) && GetTypeId() == TYPEID_PLAYER)
+    if ((IsClass(CLASS_WARRIOR, CLASS_CONTEXT_ABILITY_REACTIVE) || IsClass(CLASS_HERO, CLASS_CONTEXT_ABILITY_REACTIVE)) && GetTypeId() == TYPEID_PLAYER)
         ClearComboPoints();
 }
 
@@ -17229,11 +17243,11 @@ void Unit::UpdateReactives(uint32 p_time)
                         ModifyAuraState(AURA_STATE_DEFENSE, false);
                     break;
                 case REACTIVE_HUNTER_PARRY:
-                    if (IsClass(CLASS_HUNTER, CLASS_CONTEXT_ABILITY_REACTIVE) && HasAuraState(AURA_STATE_HUNTER_PARRY))
+                    if ((IsClass(CLASS_HUNTER, CLASS_CONTEXT_ABILITY_REACTIVE) || IsClass(CLASS_HERO, CLASS_CONTEXT_ABILITY_REACTIVE)) && HasAuraState(AURA_STATE_HUNTER_PARRY))
                         ModifyAuraState(AURA_STATE_HUNTER_PARRY, false);
                     break;
                 case REACTIVE_OVERPOWER:
-                    if (IsClass(CLASS_WARRIOR, CLASS_CONTEXT_ABILITY_REACTIVE))
+                    if ((IsClass(CLASS_WARRIOR, CLASS_CONTEXT_ABILITY_REACTIVE) || IsClass(CLASS_HERO, CLASS_CONTEXT_ABILITY_REACTIVE)))
                     {
                         ClearComboPoints();
                     }
