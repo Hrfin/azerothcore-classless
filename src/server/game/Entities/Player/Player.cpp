@@ -1793,7 +1793,7 @@ void Player::RegenerateAll()
         }
 
         Regenerate(POWER_RAGE);
-        if (IsClass(CLASS_DEATH_KNIGHT, CLASS_CONTEXT_ABILITY))
+        if (IsClass(CLASS_DEATH_KNIGHT, CLASS_CONTEXT_ABILITY) || IsClass(CLASS_HERO, CLASS_CONTEXT_ABILITY))
             Regenerate(POWER_RUNIC_POWER);
 
         m_regenTimerCount -= 2000;
@@ -2734,6 +2734,8 @@ void Player::InitStatsForLevel(bool reapplyMods)
 bool Player::HasActivePowerType(Powers power)
 {
     if (sScriptMgr->OnPlayerHasActivePowerType(this, power))
+        return true;
+    if (IsClass(CLASS_HERO, CLASS_CONTEXT_NONE))
         return true;
     else
         return (getPowerType() == power);
