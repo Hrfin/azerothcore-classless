@@ -1013,8 +1013,8 @@ class spell_dk_blood_boil : public SpellScript
 
     bool Load() override
     {
-        _executed = false;
-        return GetCaster()->GetTypeId() == TYPEID_PLAYER && GetCaster()->IsClass(CLASS_DEATH_KNIGHT, CLASS_CONTEXT_ABILITY);
+        _executed = false; 
+            return GetCaster()->GetTypeId() == TYPEID_PLAYER && (GetCaster()->IsClass(CLASS_DEATH_KNIGHT, CLASS_CONTEXT_ABILITY) || GetCaster()->IsClass(CLASS_HERO, CLASS_CONTEXT_ABILITY));
     }
 
     void HandleAfterHit()

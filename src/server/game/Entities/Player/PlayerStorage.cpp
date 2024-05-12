@@ -241,6 +241,8 @@ uint8 Player::FindEquipSlot(ItemTemplate const* proto, uint32 slot, bool swap) c
             break;
         case INVTYPE_RELIC:
         {
+            if (IsClass(CLASS_HERO, CLASS_CONTEXT_EQUIP_RELIC))
+                slots[0] = EQUIPMENT_SLOT_RANGED;
             switch (proto->SubClass)
             {
                 case ITEM_SUBCLASS_ARMOR_LIBRAM:

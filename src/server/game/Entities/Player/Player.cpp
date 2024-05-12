@@ -1763,20 +1763,24 @@ void Player::RegenerateAll()
     Regenerate(POWER_MANA);
 
     // Runes act as cooldowns, and they don't need to send any data
-    if (IsClass(CLASS_DEATH_KNIGHT, CLASS_CONTEXT_ABILITY))
+    if (IsClass(CLASS_DEATH_KNIGHT, CLASS_CONTEXT_ABILITY) || IsClass(CLASS_HERO, CLASS_CONTEXT_ABILITY))
         for (uint8 i = 0; i < MAX_RUNES; ++i)
         {
+            LOG_INFO("server", "Rune Type: {}", i);
             // xinef: implement grace
             if (int32 cd = GetRuneCooldown(i))
             {
+                LOG_INFO("server", "    Rune Cooldown: {}, Regen Timer: {}", cd, m_regenTimer);
                 SetRuneCooldown(i, (cd > m_regenTimer) ? cd - m_regenTimer : 0);
                 // start grace counter, player must be in combat and rune has to go off cooldown
                 if (IsInCombat() && cd <= m_regenTimer)
+                    LOG_INFO("server", "    In Combat, Grace: {}", m_regenTimer - cd + 1);
                     SetGracePeriod(i, m_regenTimer - cd + 1); // added 1 because m_regenTimer-cd can be equal 0
             }
             // xinef: if grace is started, increase it but no more than cap
             else if (uint32 grace = GetGracePeriod(i))
             {
+                LOG_INFO("server", "    Setting Grace: {}", grace);
                 if (grace < RUNE_GRACE_PERIOD)
                     SetGracePeriod(i, std::min<uint32>(grace + m_regenTimer, RUNE_GRACE_PERIOD));
             }
@@ -6413,7 +6417,7 @@ void Player::DuelComplete(DuelCompleteType type)
         opponent->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_WIN_DUEL, 1);
 
         // Credit for quest Death's Challenge
-        if (IsClass(CLASS_DEATH_KNIGHT, CLASS_CONTEXT_QUEST) && opponent->GetQuestStatus(12733) == QUEST_STATUS_INCOMPLETE)
+        if ((IsClass(CLASS_DEATH_KNIGHT, CLASS_CONTEXT_QUEST) || IsClass(CLASS_HERO, CLASS_CONTEXT_QUEST)) && opponent->GetQuestStatus(12733) == QUEST_STATUS_INCOMPLETE)
         {
             opponent->CastSpell(opponent, 52994, true);
         }
@@ -13395,7 +13399,7 @@ static RuneType runeSlotTypes[MAX_RUNES] =
 
 void Player::InitRunes()
 {
-    if (!IsClass(CLASS_DEATH_KNIGHT, CLASS_CONTEXT_ABILITY))
+    if (!(IsClass(CLASS_DEATH_KNIGHT, CLASS_CONTEXT_ABILITY) || IsClass(CLASS_HERO, CLASS_CONTEXT_ABILITY)))
         return;
 
     m_runes = new Runes;
@@ -14193,6 +14197,35 @@ void Player::ResummonPetTemporaryUnSummonedIfAny()
 
 bool Player::CanResummonPet(uint32 spellid)
 {
+    //if (IsClass(CLASS_HERO, CLASS_CONTEXT_PET))
+    //{
+    //    if (Pet* pet = GetPet())
+    //    {
+    //        const CreatureTemplate* cTemplate = pet->GetCreatureTemplate();
+    //        //If it's a DEATH KNIGHT pet
+    //        if (cTemplate && (cTemplate->type == CREATURE_TYPE_UNDEAD))
+    //        {
+    //            bool canSeeDKPet = CanSeeDKPet();
+    //            //If it's an undead
+    //            if (canSeeDKPet)
+    //                return true;
+    //            else if (spellid == 52150)
+    //                return false;
+    //            
+    //        }
+    //        //If it's a Mage pet
+    //        else if (cTemplate && cTemplate->type == CREATURE_TYPE_ELEMENTAL) {
+    //            bool hasMageConditions = HasSpell(31687) && HasAura(70937);
+    //            if (hasMageConditions)
+    //                return true;
+    //        }
+    //        //If it's a hunter pet type pet
+    //        else if (cTemplate && (cTemplate->type == CREATURE_TYPE_FLAG_TAMEABLE || cTemplate->type == CREATURE_TYPE_FLAG_TAMEABLE_EXOTIC))
+    //            return true;
+    //    }
+    //    return false;
+    //}
+
     if (IsClass(CLASS_DEATH_KNIGHT, CLASS_CONTEXT_PET))
     {
         if (CanSeeDKPet())

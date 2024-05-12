@@ -8850,7 +8850,7 @@ bool Unit::HandleAuraProc(Unit* victim, uint32 damage, Aura* triggeredByAura, Sp
                     // Convert recently used Blood Rune to Death Rune
                     if (Player* player = ToPlayer())
                     {
-                        if (!player->IsClass(CLASS_DEATH_KNIGHT, CLASS_CONTEXT_ABILITY))
+                        if (!(player->IsClass(CLASS_DEATH_KNIGHT, CLASS_CONTEXT_ABILITY) || player->IsClass(CLASS_HERO, CLASS_CONTEXT_ABILITY)))
                             return false;
 
                         // xinef: not true
@@ -9581,7 +9581,7 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, AuraEffect* trigg
         // Item - Death Knight T10 Melee 4P Bonus
         if (auraSpellInfo->Id == 70656)
         {
-            if (GetTypeId() != TYPEID_PLAYER || !IsClass(CLASS_DEATH_KNIGHT, CLASS_CONTEXT_ABILITY))
+            if (GetTypeId() != TYPEID_PLAYER || !(IsClass(CLASS_DEATH_KNIGHT, CLASS_CONTEXT_ABILITY) || IsClass(CLASS_HERO, CLASS_CONTEXT_ABILITY)))
                 return false;
 
             for (uint8 i = 0; i < MAX_RUNES; ++i)
@@ -9592,7 +9592,7 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, AuraEffect* trigg
         else if (auraSpellInfo->SpellIconID == 85)
         {
             Player* plr = ToPlayer();
-            if (!plr || !plr->IsClass(CLASS_DEATH_KNIGHT, CLASS_CONTEXT_ABILITY) || !procSpell)
+            if (!plr || !(plr->IsClass(CLASS_DEATH_KNIGHT, CLASS_CONTEXT_ABILITY) || plr->IsClass(CLASS_HERO, CLASS_CONTEXT_ABILITY)) || !procSpell)
                 return false;
 
             if (!plr->IsBaseRuneSlotsOnCooldown(RUNE_BLOOD))
@@ -13839,7 +13839,7 @@ void Unit::ClearInCombat()
     else if (Player* player = ToPlayer())
     {
         player->UpdatePotionCooldown();
-        if (player->IsClass(CLASS_DEATH_KNIGHT, CLASS_CONTEXT_ABILITY))
+        if (player->IsClass(CLASS_DEATH_KNIGHT, CLASS_CONTEXT_ABILITY) || player->IsClass(CLASS_HERO, CLASS_CONTEXT_ABILITY))
             for (uint8 i = 0; i < MAX_RUNES; ++i)
                 player->SetGracePeriod(i, 0);
     }

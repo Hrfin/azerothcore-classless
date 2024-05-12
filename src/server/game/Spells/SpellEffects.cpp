@@ -5754,7 +5754,7 @@ void Spell::EffectActivateRune(SpellEffIndex effIndex)
 
     Player* player = m_caster->ToPlayer();
 
-    if (!player->IsClass(CLASS_DEATH_KNIGHT, CLASS_CONTEXT_ABILITY))
+    if (!(player->IsClass(CLASS_DEATH_KNIGHT, CLASS_CONTEXT_ABILITY) || player->IsClass(CLASS_HERO, CLASS_CONTEXT_ABILITY)))
         return;
 
     // needed later

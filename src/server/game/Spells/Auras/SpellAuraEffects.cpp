@@ -6038,7 +6038,7 @@ void AuraEffect::HandleAuraConvertRune(AuraApplication const* aurApp, uint8 mode
 
     Player* player = target->ToPlayer();
 
-    if (!player->IsClass(CLASS_DEATH_KNIGHT, CLASS_CONTEXT_ABILITY))
+    if (!(player->IsClass(CLASS_DEATH_KNIGHT, CLASS_CONTEXT_ABILITY) || player->IsClass(CLASS_HERO, CLASS_CONTEXT_ABILITY)))
         return;
 
     uint32 runes = m_amount;
@@ -6282,7 +6282,7 @@ void AuraEffect::HandlePeriodicDummyAuraTick(Unit* target, Unit* caster) const
             {
                 if (target->GetTypeId() != TYPEID_PLAYER)
                     return;
-                if (!target->ToPlayer()->IsClass(CLASS_DEATH_KNIGHT, CLASS_CONTEXT_ABILITY))
+                if (!(target->ToPlayer()->IsClass(CLASS_DEATH_KNIGHT, CLASS_CONTEXT_ABILITY) || target->ToPlayer()->IsClass(CLASS_HERO, CLASS_CONTEXT_ABILITY)))
                     return;
 
                 // timer expired - remove death runes
