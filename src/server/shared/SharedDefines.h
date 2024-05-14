@@ -147,13 +147,13 @@ enum Classes
     CLASS_SHAMAN        = 7, // TITLE Shaman
     CLASS_MAGE          = 8, // TITLE Mage
     CLASS_WARLOCK       = 9, // TITLE Warlock
-    //CLASS_UNK           = 10,
-    CLASS_DRUID         = 11, // TITLE Druid
-    CLASS_HERO          = 12 // TITLE Hero
+    CLASS_HERO          = 10, // TITLE HERO
+    CLASS_DRUID         = 11 // TITLE Druid
+    //CLASS_HERO          = 12 // TITLE Hero
 };
 
 // max+1 for player class
-#define MAX_CLASSES       13
+#define MAX_CLASSES       12
 
 #define CLASSMASK_ALL_PLAYABLE \
     (1<<(CLASS_HERO-1))

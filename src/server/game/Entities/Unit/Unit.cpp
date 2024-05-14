@@ -13838,6 +13838,7 @@ void Unit::ClearInCombat()
     }
     else if (Player* player = ToPlayer())
     {
+        LOG_INFO("server", "Hitting the ClearInCombat()");
         player->UpdatePotionCooldown();
         if (player->IsClass(CLASS_DEATH_KNIGHT, CLASS_CONTEXT_ABILITY) || player->IsClass(CLASS_HERO, CLASS_CONTEXT_ABILITY))
             for (uint8 i = 0; i < MAX_RUNES; ++i)
@@ -16377,7 +16378,7 @@ void Unit::ProcDamageAndSpellFor(bool isVictim, Unit* target, uint32 procFlag, u
                 if (procExtra & PROC_EX_DODGE)
                 {
                     // Update AURA_STATE on dodge
-                    if (!IsClass(CLASS_ROGUE, CLASS_CONTEXT_ABILITY_REACTIVE) || !IsClass(CLASS_HERO, CLASS_CONTEXT_ABILITY_REACTIVE)) // skip Rogue Riposte
+                    if (!(IsClass(CLASS_ROGUE, CLASS_CONTEXT_ABILITY_REACTIVE) || IsClass(CLASS_HERO, CLASS_CONTEXT_ABILITY_REACTIVE))) // skip Rogue Riposte
                     {
                         ModifyAuraState(AURA_STATE_DEFENSE, true);
                         StartReactiveTimer(REACTIVE_DEFENSE);
@@ -16410,7 +16411,7 @@ void Unit::ProcDamageAndSpellFor(bool isVictim, Unit* target, uint32 procFlag, u
                 // Overpower on victim dodge
                 if (procExtra & PROC_EX_DODGE)
                 {
-                    if (IsClass(CLASS_WARRIOR, CLASS_CONTEXT_ABILITY_REACTIVE) || IsClass(CLASS_HERO, CLASS_CONTEXT_ABILITY_REACTIVE))
+                    if (IsClass(CLASS_WARRIOR, CLASS_CONTEXT_ABILITY_REACTIVE))
                     {
                         AddComboPoints(target, 1);
                         StartReactiveTimer(REACTIVE_OVERPOWER);
@@ -17143,7 +17144,6 @@ void Unit::AddComboPoints(Unit* target, int8 count)
     {
         m_comboPoints = std::max<int8>(std::min<int8>(m_comboPoints + count, 5), 0);
     }
-
     SendComboPoints();
 }
 
@@ -17247,7 +17247,7 @@ void Unit::UpdateReactives(uint32 p_time)
                         ModifyAuraState(AURA_STATE_HUNTER_PARRY, false);
                     break;
                 case REACTIVE_OVERPOWER:
-                    if ((IsClass(CLASS_WARRIOR, CLASS_CONTEXT_ABILITY_REACTIVE) || IsClass(CLASS_HERO, CLASS_CONTEXT_ABILITY_REACTIVE)))
+                    if ((IsClass(CLASS_WARRIOR, CLASS_CONTEXT_ABILITY_REACTIVE)))
                     {
                         ClearComboPoints();
                     }

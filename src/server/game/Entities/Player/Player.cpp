@@ -1766,21 +1766,21 @@ void Player::RegenerateAll()
     if (IsClass(CLASS_DEATH_KNIGHT, CLASS_CONTEXT_ABILITY) || IsClass(CLASS_HERO, CLASS_CONTEXT_ABILITY))
         for (uint8 i = 0; i < MAX_RUNES; ++i)
         {
-            LOG_INFO("server", "Rune Type: {}", i);
+            //LOG_INFO("server", "Rune Type: {}", i);
             // xinef: implement grace
             if (int32 cd = GetRuneCooldown(i))
             {
-                LOG_INFO("server", "    Rune Cooldown: {}, Regen Timer: {}", cd, m_regenTimer);
+                //LOG_INFO("server", "    Rune Cooldown: {}, Regen Timer: {}", cd, m_regenTimer);
                 SetRuneCooldown(i, (cd > m_regenTimer) ? cd - m_regenTimer : 0);
                 // start grace counter, player must be in combat and rune has to go off cooldown
                 if (IsInCombat() && cd <= m_regenTimer)
-                    LOG_INFO("server", "    In Combat, Grace: {}", m_regenTimer - cd + 1);
+                    //LOG_INFO("server", "    In Combat, Grace: {}", m_regenTimer - cd + 1);
                     SetGracePeriod(i, m_regenTimer - cd + 1); // added 1 because m_regenTimer-cd can be equal 0
             }
             // xinef: if grace is started, increase it but no more than cap
             else if (uint32 grace = GetGracePeriod(i))
             {
-                LOG_INFO("server", "    Setting Grace: {}", grace);
+                //LOG_INFO("server", "    Setting Grace: {}", grace);
                 if (grace < RUNE_GRACE_PERIOD)
                     SetGracePeriod(i, std::min<uint32>(grace + m_regenTimer, RUNE_GRACE_PERIOD));
             }

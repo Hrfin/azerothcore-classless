@@ -1036,8 +1036,10 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
     PetType petType = MAX_PET_TYPE;
     if (owner->GetTypeId() == TYPEID_PLAYER)
     {
+        uint32 temp1 = cinfo->type;
+        uint32 temp2 = cinfo->type_flags;
         sScriptMgr->OnBeforeGuardianInitStatsForLevel(owner->ToPlayer(), this, cinfo, petType);
-
+        LOG_INFO("server", "GetEntry: {}, petType: {}, type: {}, typeFlags: {}", GetEntry(), petType, temp1, temp2);
         if (IsPet())
         {
             if (petType == MAX_PET_TYPE)
@@ -1161,56 +1163,38 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
                 SetUInt32Value(UNIT_FIELD_PETNEXTLEVELEXP, uint32(sObjectMgr->GetXPForLevel(petlevel)* sWorld->getRate(RATE_XP_PET_NEXT_LEVEL)));
                 break;
             }
-        case SUMMON_PET:
-            {
-                if (pInfo)
-                {
-                    SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, float(pInfo->min_dmg));
-                    SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, float(pInfo->max_dmg));
-                }
-                else
-                {
-                    SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, float(petlevel - (petlevel / 4)));
-                    SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, float(petlevel + (petlevel / 4)));
-                }
-
-                switch(GetEntry())
-                {
-                    case NPC_FELGUARD:
-                        {
-                            // xinef: Glyph of Felguard, so ugly im crying... no appropriate spell
-                            if (AuraEffect* aurEff = owner->GetAuraEffectDummy(SPELL_GLYPH_OF_FELGUARD))
-                            {
-                                HandleStatModifier(UNIT_MOD_ATTACK_POWER, TOTAL_PCT, aurEff->GetAmount(), true);
-                            }
-
-                            break;
-                        }
-                    case NPC_VOIDWALKER:
-                        {
-                            if (AuraEffect* aurEff = owner->GetAuraEffectDummy(SPELL_GLYPH_OF_VOIDWALKER))
-                            {
-                                HandleStatModifier(UNIT_MOD_STAT_STAMINA, TOTAL_PCT, aurEff->GetAmount(), true);
-                            }
-                            break;
-                        }
-                    case NPC_WATER_ELEMENTAL_PERM:
-                        {
-                            AddAura(SPELL_PET_AVOIDANCE, this);
-                            AddAura(SPELL_HUNTER_PET_SCALING_04, this);
-                            AddAura(SPELL_MAGE_PET_SCALING_01, this);
-                            AddAura(SPELL_MAGE_PET_SCALING_02, this);
-                            AddAura(SPELL_MAGE_PET_SCALING_03, this);
-                            AddAura(SPELL_MAGE_PET_SCALING_04, this);
-                            break;
-                        }
-                }
-                break;
-            }
         default:
             {
                 switch (GetEntry())
                 {
+                    case NPC_FELGUARD:
+                    {
+                        // xinef: Glyph of Felguard, so ugly im crying... no appropriate spell
+                        if (AuraEffect* aurEff = owner->GetAuraEffectDummy(SPELL_GLYPH_OF_FELGUARD))
+                        {
+                            HandleStatModifier(UNIT_MOD_ATTACK_POWER, TOTAL_PCT, aurEff->GetAmount(), true);
+                        }
+
+                        break;
+                    }
+                    case NPC_VOIDWALKER:
+                    {
+                        if (AuraEffect* aurEff = owner->GetAuraEffectDummy(SPELL_GLYPH_OF_VOIDWALKER))
+                        {
+                            HandleStatModifier(UNIT_MOD_STAT_STAMINA, TOTAL_PCT, aurEff->GetAmount(), true);
+                        }
+                        break;
+                    }
+                    case NPC_WATER_ELEMENTAL_PERM:
+                    {
+                        AddAura(SPELL_PET_AVOIDANCE, this);
+                        AddAura(SPELL_HUNTER_PET_SCALING_04, this);
+                        AddAura(SPELL_MAGE_PET_SCALING_01, this);
+                        AddAura(SPELL_MAGE_PET_SCALING_02, this);
+                        AddAura(SPELL_MAGE_PET_SCALING_03, this);
+                        AddAura(SPELL_MAGE_PET_SCALING_04, this);
+                        break;
+                    }
                     case NPC_FIRE_ELEMENTAL:
                         {
                             SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, float(petlevel * 3.5f - petlevel));
