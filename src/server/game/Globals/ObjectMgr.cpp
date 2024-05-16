@@ -4678,7 +4678,7 @@ void ObjectMgr::LoadQuests()
         {
             if (!(qinfo->RequiredClasses & CLASSMASK_ALL_PLAYABLE))
             {
-                LOG_ERROR("sql.sql", "Quest {} does not contain any playable classes in `RequiredClasses` ({}), value set to 0 (all classes).", qinfo->GetQuestId(), qinfo->RequiredClasses);
+                LOG_ERROR("sql.sql", "Quest {} does not contain any playable classes in `AllowableClasses` ({}), value set to 0 (all classes).", qinfo->GetQuestId(), qinfo->RequiredClasses);
                 qinfo->RequiredClasses = 0;
             }
         }

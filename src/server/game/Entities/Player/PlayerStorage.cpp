@@ -4644,7 +4644,7 @@ void Player::ApplyEnchantment(Item* item, EnchantmentSlot slot, bool apply, bool
                 }
                 case ITEM_ENCHANTMENT_TYPE_TOTEM:           // Shaman Rockbiter Weapon
                 {
-                    if (IsClass(CLASS_SHAMAN, CLASS_CONTEXT_ABILITY))
+                    if (IsClass(CLASS_SHAMAN, CLASS_CONTEXT_ABILITY) || IsClass(CLASS_HERO, CLASS_CONTEXT_ABILITY))
                     {
                         float addValue = 0.0f;
                         if (item->GetSlot() == EQUIPMENT_SLOT_MAINHAND)

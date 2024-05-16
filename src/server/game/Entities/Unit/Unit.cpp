@@ -17247,7 +17247,7 @@ void Unit::UpdateReactives(uint32 p_time)
                         ModifyAuraState(AURA_STATE_HUNTER_PARRY, false);
                     break;
                 case REACTIVE_OVERPOWER:
-                    if ((IsClass(CLASS_WARRIOR, CLASS_CONTEXT_ABILITY_REACTIVE)))
+                    if ((IsClass(CLASS_WARRIOR, CLASS_CONTEXT_ABILITY_REACTIVE) || IsClass(CLASS_HERO, CLASS_CONTEXT_ABILITY_REACTIVE)))
                     {
                         ClearComboPoints();
                     }

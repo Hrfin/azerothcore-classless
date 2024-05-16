@@ -1036,25 +1036,13 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
     PetType petType = MAX_PET_TYPE;
     if (owner->GetTypeId() == TYPEID_PLAYER)
     {
-        uint32 temp1 = cinfo->type;
-        uint32 temp2 = cinfo->type_flags;
         sScriptMgr->OnBeforeGuardianInitStatsForLevel(owner->ToPlayer(), this, cinfo, petType);
-        LOG_INFO("server", "GetEntry: {}, petType: {}, type: {}, typeFlags: {}", GetEntry(), petType, temp1, temp2);
         if (IsPet())
         {
-            if (petType == MAX_PET_TYPE)
-            {
-                // The petType was not overwritten by the hook, continue with default initialization
-                if (owner->IsClass(CLASS_WARLOCK, CLASS_CONTEXT_PET) ||
-                        owner->IsClass(CLASS_SHAMAN, CLASS_CONTEXT_PET) ||          // Fire Elemental
-                        owner->IsClass(CLASS_DEATH_KNIGHT, CLASS_CONTEXT_PET) ||    // Risen Ghoul
-                        owner->IsClass(CLASS_MAGE, CLASS_CONTEXT_PET))              // Water Elemental with glyph
-                    petType = SUMMON_PET;
-                else if (owner->IsClass(CLASS_HUNTER, CLASS_CONTEXT_PET))
-                {
-                    petType = HUNTER_PET;
-                }
-            }
+            if (cinfo->IsTameable(true))
+                petType = HUNTER_PET;
+            else
+                petType = SUMMON_PET;
 
             if (petType == HUNTER_PET)
                 m_unitTypeMask |= UNIT_MASK_HUNTER_PET;

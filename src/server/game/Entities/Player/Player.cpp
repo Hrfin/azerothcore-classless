@@ -14197,35 +14197,17 @@ void Player::ResummonPetTemporaryUnSummonedIfAny()
 
 bool Player::CanResummonPet(uint32 spellid)
 {
-    //if (IsClass(CLASS_HERO, CLASS_CONTEXT_PET))
-    //{
-    //    if (Pet* pet = GetPet())
-    //    {
-    //        const CreatureTemplate* cTemplate = pet->GetCreatureTemplate();
-    //        //If it's a DEATH KNIGHT pet
-    //        if (cTemplate && (cTemplate->type == CREATURE_TYPE_UNDEAD))
-    //        {
-    //            bool canSeeDKPet = CanSeeDKPet();
-    //            //If it's an undead
-    //            if (canSeeDKPet)
-    //                return true;
-    //            else if (spellid == 52150)
-    //                return false;
-    //            
-    //        }
-    //        //If it's a Mage pet
-    //        else if (cTemplate && cTemplate->type == CREATURE_TYPE_ELEMENTAL) {
-    //            bool hasMageConditions = HasSpell(31687) && HasAura(70937);
-    //            if (hasMageConditions)
-    //                return true;
-    //        }
-    //        //If it's a hunter pet type pet
-    //        else if (cTemplate && (cTemplate->type == CREATURE_TYPE_FLAG_TAMEABLE || cTemplate->type == CREATURE_TYPE_FLAG_TAMEABLE_EXOTIC))
-    //            return true;
-    //    }
-    //    return false;
-    //}
-
+    if (IsClass(CLASS_HERO, CLASS_CONTEXT_PET))
+    {
+        if (HasSpell(31687) && HasAura(70937))  //Has [Summon Water Elemental] spell and [Glyph of Eternal Water].
+            return true;
+        if (CanSeeDKPet())
+            return true;
+        else if (spellid == 52150) // Raise Dead
+            return false;
+        else
+            return HasSpell(spellid);
+    }
     if (IsClass(CLASS_DEATH_KNIGHT, CLASS_CONTEXT_PET))
     {
         if (CanSeeDKPet())
